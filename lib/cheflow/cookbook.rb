@@ -6,7 +6,7 @@ module Cheflow
 
     def initialize(options)
       @options = options
-      @berksfile = Berkshelf::Berksfile.from_options(options)
+      @berksfile = Berkshelf::Berksfile.from_options(options.dup)
     end
 
     def metadata
