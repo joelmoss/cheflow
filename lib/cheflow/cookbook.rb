@@ -35,11 +35,11 @@ module Cheflow
     end
 
     def node_environment_objects
-      @node_environments ||= ridley.search(:environment, "name:node_mongodb*")
+      @node_environment_objects ||= ridley.search(:environment, "name:node_mongodb*")
     end
 
     def node_environments
-      @node_environment_names ||= node_environment_objects.map do |e|
+      @node_environments ||= node_environment_objects.map do |e|
         env = e.name.gsub /^#{name}_/, ''
         env = env == name ? 'production' : env
         "#{env.ljust(12)} (#{e.cookbook_versions[name]})"

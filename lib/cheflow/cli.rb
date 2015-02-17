@@ -73,9 +73,19 @@ module Cheflow
       say
       say "Environments: #{cookbook.node_environments.join("\n              ")}"
       say
-      say 'Versions:'
-      say "  Production:  " + cookbook.prod_versions.join(', ')
-      say "  Development: " + cookbook.dev_versions.join(', ')
+      say 'Versions: (most recent)'
+
+      if (pv = cookbook.prod_versions).count > 15
+        say "  Production:  #{pv[0,15].join(', ')} (...)"
+      else
+        say "  Production:  #{pv.join(', ')} "
+      end
+
+      if (dv = cookbook.dev_versions).count > 15
+        say "  Development:  #{dv[0,15].join(', ')} (...)"
+      else
+        say "  Development:  #{dv.join(', ')} "
+      end
     end
 
     desc 'default', 'Show version, info and help'
