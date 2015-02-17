@@ -29,13 +29,29 @@ module Cheflow
     end
 
     def type
-      if name.start_with? 'node_'
-        'Node'
+      @type ||= if name.start_with? 'node_'
+        :node
+      else
+        :application
       end
     end
 
+    def node_cookbook?
+      type == :node
+    end
+
+    def application_cookbook?
+      type == :application
+    end
+
     def node_environment_objects
-      @node_environment_objects ||= ridley.search(:environment, "name:node_mongodb*")
+      @node_environment_objects ||= begin
+        if node_cookbook?
+          ridley.search(:environment, "name:#{name}*")
+        else
+          ridley.search(:environment, "cookbook_versions:#{name}")
+        end
+      end
     end
 
     def node_environments
@@ -43,7 +59,7 @@ module Cheflow
         env = e.name.gsub /^#{name}_/, ''
         env = env == name ? 'production' : env
         "#{env.ljust(12)} (#{e.cookbook_versions[name]})"
-      end
+      end.sort
     end
 
     def versions

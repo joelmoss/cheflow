@@ -68,23 +68,24 @@ module Cheflow
 
     desc 'info', 'Display information about the cookbook'
     def info
-      say "#{cookbook.type} Cookbook: #{cookbook}"
+      say "#{cookbook.type.capitalize} Cookbook: #{cookbook}"
       say cookbook.path
       say
       say "Environments: #{cookbook.node_environments.join("\n              ")}"
       say
+
       say 'Versions: (most recent)'
 
       if (pv = cookbook.prod_versions).count > 15
         say "  Production:  #{pv[0,15].join(', ')} (...)"
       else
-        say "  Production:  #{pv.join(', ')} "
+        say "  Production:  #{pv.join(', ')}"
       end
 
       if (dv = cookbook.dev_versions).count > 15
         say "  Development:  #{dv[0,15].join(', ')} (...)"
       else
-        say "  Development:  #{dv.join(', ')} "
+        say "  Development:  #{dv.join(', ')}"
       end
     end
 
