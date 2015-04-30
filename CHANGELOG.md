@@ -1,3 +1,7 @@
+## UNRELEASED
+
+- [Improvement] Don't return an environment that has no versions of the cookbook in it.
+
 ## 0.2.0
 
 - [Improvement] Only showing the 15 most recent version in the info command.

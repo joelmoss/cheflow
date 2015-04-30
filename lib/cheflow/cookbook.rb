@@ -58,8 +58,8 @@ module Cheflow
       @node_environments ||= node_environment_objects.map do |e|
         env = e.name.gsub /^#{name}_/, ''
         env = env == name ? 'production' : env
-        "#{env.ljust(12)} (#{e.cookbook_versions[name]})"
-      end.sort
+        "#{env.ljust(12)} (#{e.cookbook_versions[name]})" if e.cookbook_versions[name]
+      end.compact.sort
     end
 
     def versions
