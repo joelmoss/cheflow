@@ -21,21 +21,11 @@ module Cheflow
 
     namespace 'cheflow'
 
-    map 'up' => :upgrade
+    map 'up' => :upload
     map 'i' => :info
     map 'b' => :bump
     map ["ver", "-v", "--version"] => :version
 
-    class_option :verbose,
-      type: :boolean,
-      desc: "Output verbose information",
-      aliases: "-v",
-      default: false
-    class_option :debug,
-      type: :boolean,
-      desc: "Output debug information",
-      aliases: "-d",
-      default: false
     class_option :berksfile,
       type: :string,
       default: nil,
@@ -58,9 +48,21 @@ module Cheflow
       aliases: "-P",
       default: nil
 
-    # desc "upgrade [environment]", "Upload and apply the current cookbook version to the specified"
-    # def upgrade(env = 'development')
-    # end
+    desc 'upload', 'Upload the current cookbook'
+    long_desc <<-LONGDESC
+      Upload the current cookbook - the current cookbook being that which is in the current working
+      directory. The current version of the cookbook will determine if this upload should be frozen
+      or not. If it is a dev version (ie. a patch release), then the uploaded cookbook is not
+      frozen.
+    LONGDESC
+    def upload
+      say "Uploading #{cookbook.type} Cookbook: #{cookbook}"
+      begin
+        cookbook.upload
+      rescue Ridley::Errors::FrozenCookbook => e
+        say e, :red
+      end
+    end
 
     desc 'version', 'Display version information'
     def version
@@ -95,7 +97,7 @@ module Cheflow
 
     desc 'info', 'Display information about the cookbook'
     def info
-      say "#{cookbook.type.capitalize} Cookbook: #{cookbook}"
+      say "#{cookbook.type.capitalize} Cookbook: #{cookbook}", :bold
       say cookbook.path
       say
       say "Environments: #{cookbook.node_environments.join("\n              ")}"

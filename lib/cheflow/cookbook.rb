@@ -32,16 +32,12 @@ module Cheflow
       @type ||= if name.start_with? 'node_'
         :node
       else
-        :application
+        :non_node
       end
     end
 
     def node_cookbook?
       type == :node
-    end
-
-    def application_cookbook?
-      type == :application
     end
 
     def node_environment_objects
@@ -80,6 +76,10 @@ module Cheflow
 
     def frozen?
       ridley.cookbook.find(name, version).frozen?
+    end
+
+    def upload
+      ridley.cookbook.upload path, freeze: !version.patch.odd?
     end
 
 
