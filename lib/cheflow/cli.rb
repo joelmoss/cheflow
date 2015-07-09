@@ -22,6 +22,7 @@ module Cheflow
     namespace 'cheflow'
 
     map 'up' => :upload
+    map 'a' => :apply
     map 'i' => :info
     map 'b' => :bump
     map ["ver", "-v", "--version"] => :version
@@ -101,20 +102,31 @@ module Cheflow
       say cookbook.path
       say
       say "Environments: #{cookbook.node_environments.join("\n              ")}"
-      say
 
-      say 'Versions: (most recent)'
+      pv = cookbook.prod_versions
+      dv = cookbook.dev_versions
 
-      if (pv = cookbook.prod_versions).count > 15
-        say "  Production:  #{pv[0,15].join(', ')} (...)"
-      else
-        say "  Production:  #{pv.join(', ')}"
-      end
+      if dv.count > 0 || pv.count > 0
+        say
+        say 'Versions: (most recent)'
 
-      if (dv = cookbook.dev_versions).count > 15
-        say "  Development:  #{dv[0,15].join(', ')} (...)"
-      else
-        say "  Development:  #{dv.join(', ')}"
+        if pv.count > 0
+          if pv.count > 10
+            say "  Production:  #{pv[0,10].join(', ')} (...)"
+          else
+            say "  Production:  #{pv.join(', ')}"
+          end
+        end
+
+        if dv.count > 0
+          if dv.count > 10
+            say "  Development:  #{dv[0,10].join(', ')} (...)"
+          else
+            say "  Development:  #{dv.join(', ')}"
+          end
+        end
+
+        say
       end
     end
 

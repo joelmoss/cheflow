@@ -56,6 +56,12 @@ Upload the current cookbook - the current cookbook being that which is in the cu
 directory. The current version of the cookbook will determine if this upload should be frozen or
 not. If it is a dev version (ie. a patch release), then the uploaded cookbook is not frozen.
 
+### Apply
+
+    cheflow apply|a
+
+Apply the current Berksfile.lock file to the current Node cookbook's environment.
+
 
 
 ## Workflow
