@@ -20,21 +20,68 @@ For the full details, read COOKBOOKS.md.
 
 ## Installation
 
-Install Cheflow into the ChefDK
+Install Cheflow into the ChefDK:
 
     $ chef gem install cheflow
+
+
+
+## Commands
+
+### Info
+
+    cheflow info|i
+
+Displays useful information about the current cookbook, including the environments this cookbook is
+being used in, and the list of versions.
+
+This is also the default command that will be executed if you run Cheflow without any command.
+
+    cheflow
+
+### Bump
+
+    cheflow bump|b
+
+Bumps the version of the current cookbook. By default, this will be the dev version (patch). To bump
+the major or minor version, just pass that as the first argument:
+
+    cheflow bump minor
+
+### Upload
+
+    cheflow upload|up
+
+Upload the current cookbook - the current cookbook being that which is in the current working
+directory. The current version of the cookbook will determine if this upload should be frozen or
+not. If it is a dev version (ie. a patch release), then the uploaded cookbook is not frozen.
+
 
 
 ## Workflow
 
 The Cheflow workflow is predominantly based on the current Cookbook version, which determines
 whether to apply version locks from Berksfile.lock to the production environment or not.
+Additionally, it will determine if the current cookbook is a node cookbook or not, and behave
+accordingly.
+
 
 ### Development Releases
 
 If the version's patch number is an odd one, ie. a dev release, then the environment should be
 specified. If no environment is specified, then it will default to `development`. Cheflow will not
 allow you to lock a development release to production, even if you specify it.
+
+
+#### Publish a development version of a Non-Node cookbook
+
+- Bump the dev version of the non-node cookbook. (eg. 1.0.0 to 1.0.1)
+- Upload the cookbook without freezing: `berks up COOKBOOK --no-freeze`
+
+Equivalent Cheflow command:
+
+    cheflow upload
+
 
 #### Create a new development version of a Node cookbook
 
@@ -49,6 +96,7 @@ Equivalent Cheflow command:
 
 Default environment is `development`.
 
+
 #### Update development version of a Node cookbook
 
 - Upload new unfrozen version: `berks upload COOKBOOK --no-freeze`.
@@ -58,6 +106,7 @@ Cheflow command:
     cheflow up [ENVIRONMENT]
 
 Default environment is `development`.
+
 
 ### Production Releases
 

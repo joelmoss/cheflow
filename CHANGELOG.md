@@ -1,6 +1,7 @@
 ## UNRELEASED
 
 - [Improvement] Don't return an environment that has no versions of the cookbook in it.
+- [Feature] Added new `bump` command which will bump the version of the current cookbook.
 
 ## 0.2.0
 

@@ -23,6 +23,7 @@ module Cheflow
 
     map 'up' => :upgrade
     map 'i' => :info
+    map 'b' => :bump
     map ["ver", "-v", "--version"] => :version
 
     class_option :verbose,
@@ -64,6 +65,32 @@ module Cheflow
     desc 'version', 'Display version information'
     def version
       say "Cheflow v#{Cheflow::VERSION}"
+    end
+
+    desc 'bump', 'Bump the version, which is by default the patch version.'
+    long_desc <<-LONGDESC
+      Pass in the Semver level as the first argument to specify which level to bump.
+      Available levels are `major`, `minor` or `patch`.
+
+      Bump the patch version:
+      \x5> $ cheflow bump
+
+      Bump the major version:
+      \x5> $ cheflow bump major
+    LONGDESC
+    def bump(level='patch')
+      from = cookbook.version
+      major, minor, patch = from.major, from.minor, from.patch
+      binding.eval("#{level} = #{from.send(level)+1}")
+      to = "#{major}.#{minor}.#{patch}"
+
+      version_file = File.join(cookbook.path, 'VERSION')
+      if File.exist? version_file
+        File.open(version_file, 'w') { |file| file.puts to }
+        say "Bumped #{level} version from #{from} to #{to}", :green
+      else
+        say "The 'VERSION' file does not exist, so cannot bump the #{level} version", :red
+      end
     end
 
     desc 'info', 'Display information about the cookbook'

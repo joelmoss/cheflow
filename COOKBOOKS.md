@@ -1,63 +1,8 @@
 ## Cookbooks
 
-Each cookbook has a pattern applied to it, which is one of Library, Application, or Node, and every
-cookbook should reside in its own Git repository.
-
-
-### Library Cookbooks
-
-This is the most basic building block of Cookbooks. These types of cookbooks are reusable and are
-mixed into other cookbooks to enhance them by:
-
-  - Adding LWRPs that abstract common functionality
-  - Including Libraries that add Ruby modules/classes for any depending cookbooks
-
-The goal of these cookbooks is to abstract common things into re-usable building blocks. They often
-do not include a single recipe because their job is to solely enhance the Chef primitives. It is
-also very common for these cookbooks to not include attributes since there's nothing to configure.
-
-Library cookbooks may depend on other library cookbooks or application cookbooks. They never depend
-on a Node Cookbook and they never depend on a Wrapper cookbook.
-
-Since the name of an LWRP is derived from the cookbook it is defined in, these cookbooks are named
-with that in mind. Pick names that make sense for the way you want LWRPs to appear in recipes.
-
-Library cookbooks are usually public, and you are strongly encouraged to open source your Library
-cookbooks.
-
-
-### Application Cookbooks
-
-These describe a single application or a single piece of software, that share the same name as the
-cookbook itself. If the application the cookbook manages contains multiple components then each one
-is broken up into it's own recipe and the recipe is named after the component it will install.
-Things are broken up in this way so you could install various components spread across a number of
-nodes within an environment.
-
-These cookbooks almost always contain a set of attributes which act as the runtime configuration for
-the cookbook. These attributes can do something like setting a port number or even describing the
-desired state of a service.
-
-Application cookbooks may depend on Library Cookbooks and other Application Cookbooks. They never
-depend on Node Cookbooks. They never depend on a Wrapper or Base Cookbook unless they are intended
-to be internal to your organization and will never be distributed to the Chef Community Site.
-
-These cookbooks are always named after the application they manage, and are usually name-spaced
-with your organization name as a prefix `{organization}_{application_cookbook}`.
-
-
-### Wrapper Cookbooks
-
-This is the lightest Cookbook out of all the known Cookbook patterns. It does a very simple job of
-depending on an Application Cookbook and then exposing a recipe for each recipe found in the
-Application Cookbook that it is wrapping.
-
-Wrapper cookbooks depend on Application Cookbooks only. They do not depend on other Wrapper
-Cookbooks, Library Cookbooks, or Environment Cookbooks.
-
-These cookbooks follow the naming convention `{organization}_{wrapped_cookbook}` or even sometimes
-`{application}_{wrapped_cookbook}`. So the RabbitMQ cookbook for Codio would be called
-`codio_rabbitmq`.
+Each and every cookbook is either a Node or a Non-Node cookbook, and every cookbook should reside in
+its very own Git repository. Additionally, there is a Base cookbook that must be the very first
+dependency of each Node cookbook.
 
 
 ### Node Cookbooks
@@ -76,16 +21,37 @@ achieved using Chef Environments, where a Node cookbook directly corresponds to 
 of the same name. The Berkshelf lock file is converted into the environment's `cookbook_versions`
 using the Berkshelf `apply` command.
 
+Node cookbooks should never be a dependency for any other cookbook.
+
 Node cookbook names are prefixed with `node_`. For example `node_webserver`
+
+
+### Non-Node Cookbook
+
+Anything that is not specific to a node, and is required to be reusable, should appear in a Non-Node
+cookbook.
+
+Non-Node cookbooks should be consumed and depended on by one or more Node cookbooks, and should
+never be used directly. Easy peasy!
 
 
 ### Base Cookbook
 
-All Node Cookbooks require at least one dependency, and that is the Base cookbook. The Base Cookbook
-is very similar in nature to a Library Cookbook. It contains several recipes that are common to all
-nodes. Examples include configuring NTP and creating system users and SSH access.
+All Node Cookbooks require at least one dependency, and that is the Base cookbook.
 
-The default recipe of your Node cookbooks would be the best place to include your Base cookbook.
+This is the most basic building block of Cookbooks. These types of cookbooks are reusable and are
+mixed into other Node cookbooks to enhance them by:
+
+  - Adding LWRPs that abstract common functionality
+  - Including Libraries that add Ruby modules/classes for any depending cookbooks
+
+The goal of these cookbooks is to abstract common things into re-usable building blocks. It contains
+several recipes that are common to all nodes. Examples include configuring NTP, creating system
+users and SSH access.
+
+The default recipe of your Node cookbooks should usually begin with your Base cookbook being
+included first.
+
 
 
 ## Cookbook Development
@@ -103,12 +69,11 @@ made in that release.
 [Berkshelf](http://berkshelf.com/) is used to manage Cookbook dependencies in all Cookbooks,
 especially Node Cookbooks.
 
-Every Cookbook, no matter what type should alwsy contain a Berksfile with at least the following
+Every Cookbook, no matter what type should always containa a Berksfile with at least the following
 content:
 
 ```ruby
 source "http://berkshelf-api.int.codio.com"
-
 metadata
 ```
 
