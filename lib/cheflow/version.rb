@@ -1,3 +1,3 @@
 module Cheflow
-  VERSION = "0.3.0.pre"
+  VERSION = "1.0.0.alpha1"
 end
