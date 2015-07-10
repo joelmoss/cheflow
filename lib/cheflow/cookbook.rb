@@ -24,6 +24,11 @@ module Cheflow
       @name ||= metadata.name
     end
 
+    # The name of the Node cookbook without the "node_" prefix.
+    def node_name
+      @node_name ||= node_cookbook? ? name.sub(/^node_/, '') : name
+    end
+
     def path
       @path ||= File.dirname(berksfile.filepath)
     end
@@ -50,11 +55,13 @@ module Cheflow
       end
     end
 
-    def node_environments
+    def node_environments(with_versions=false)
       @node_environments ||= node_environment_objects.map do |e|
         env = e.name.gsub /^#{name}_/, ''
         env = env == name ? 'production' : env
-        "#{env.ljust(12)} (#{e.cookbook_versions[name]})" if e.cookbook_versions[name]
+        out = with_versions ? env.ljust(12) : env
+        out += " (#{e.cookbook_versions[name]})" if with_versions
+        out
       end.compact.sort
     end
 

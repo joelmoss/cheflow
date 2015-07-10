@@ -22,7 +22,9 @@ module Cheflow
     namespace 'cheflow'
 
     map 'up' => :upload
+    map 'ud' => :update
     map 'a' => :apply
+    map 'o' => :outdated
     map 'i' => :info
     map 'b' => :bump
     map ["ver", "-v", "--version"] => :version
@@ -62,6 +64,52 @@ module Cheflow
         cookbook.upload
       rescue Ridley::Errors::FrozenCookbook => e
         say e, :red
+        exit(1)
+      end
+    end
+
+    desc 'update [COOKBOOKS]', 'Update the cookbooks (and dependencies) specified in the Berksfile'
+    def update(*cookbook_names)
+      cookbook.berksfile.update *cookbook_names
+    end
+
+    desc 'outdated [COOKBOOKS]', 'List dependencies that have new versions available that satisfy their constraints'
+    def outdated(*names)
+      outdated = cookbook.berksfile.outdated(*names)
+      Berkshelf.formatter.outdated(outdated)
+    end
+
+    desc 'apply ENVIRONMENT', 'Apply version locks from Berksfile.lock to a Chef environment'
+    def apply(environment_name)
+      unless cookbook.node_cookbook?
+        say "Cannot apply Non-Node Cookbooks. Run this again for a Node Cookbook", :red
+        exit(1)
+      end
+
+      lockfile = File.join(cookbook.path, Berkshelf::Lockfile::DEFAULT_FILENAME)
+      unless File.exist?(lockfile)
+        say "No lockfile found at #{lockfile}", :red
+        exit(1)
+      end
+
+      full_environment_name = "node_#{cookbook.node_name}"
+      full_environment_name += "_#{environment_name}" if environment_name != 'production'
+
+      say "Applying Node Cookbook #{cookbook} and its dependencies to #{environment_name} (#{full_environment_name})", :bold
+
+      if environment_name == 'production'
+        exit(1) unless yes?('Are you sure you wish to apply locked versions to production?', :red)
+      end
+
+      lockfile = Berkshelf::Lockfile.from_file(lockfile)
+      begin
+        unless lockfile.apply(full_environment_name)
+          error "Failed to apply locked versions"
+          exit(1)
+        end
+      rescue Berkshelf::EnvironmentNotFound => e
+        say "Unable to apply locked versions. #{e}", :red
+        exit(1)
       end
     end
 
@@ -93,6 +141,7 @@ module Cheflow
         say "Bumped #{level} version from #{from} to #{to}", :green
       else
         say "The 'VERSION' file does not exist, so cannot bump the #{level} version", :red
+        exit(1)
       end
     end
 
@@ -101,7 +150,7 @@ module Cheflow
       say "#{cookbook.type.capitalize} Cookbook: #{cookbook}", :bold
       say cookbook.path
       say
-      say "Environments: #{cookbook.node_environments.join("\n              ")}"
+      say "Environments: #{cookbook.node_environments(true).join("\n              ")}"
 
       pv = cookbook.prod_versions
       dv = cookbook.dev_versions

@@ -1,8 +1,10 @@
 ## 0.3.0 (UNRELEASED)
 
 - [Improvement] Don't return an environment that has no versions of the cookbook in it.
-- [Feature] Added new `bump` command which will bump the version of the current cookbook.
-- [Feature] Added new `upload` command which will upload the current cookbook.
+- [Feature] Added `bump` command which will bump the version of the current cookbook.
+- [Feature] Added `upload` command which will upload the current cookbook.
+- [Feature] Added straight up copies of the `outdated` and `update` Berkshelf commands.
+- [Feature] Added `apply` command to apply locked versions to the given environment.
 
 ## 0.2.0
 
